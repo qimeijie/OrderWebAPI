@@ -6,10 +6,10 @@ using Order.Infrastucture.Data;
 namespace Order.Infrastucture.Repositories
 {
 
-    public class OrderRepository : IOrderRepository
+    public class OrderRepositoryAsync : IOrderRepositoryAsync
     {
         private readonly OrderDbContext _orderDbContext;
-        public OrderRepository(OrderDbContext orderDbContext)
+        public OrderRepositoryAsync(OrderDbContext orderDbContext)
         {
             _orderDbContext = orderDbContext;
         }

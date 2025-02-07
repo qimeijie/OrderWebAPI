@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Order.ApplicationCore.Contracts.Repositories;
-using Order.ApplicationCore.Entities;
+using Order.ApplicationCore.Contracts.Services;
+using Order.ApplicationCore.Model;
 
 namespace Order.API.Controllers
 {
@@ -8,24 +8,25 @@ namespace Order.API.Controllers
     [ApiController]
     public class OrdersController : ControllerBase
     {
-        private readonly IOrderRepository _orderRepository;
-        public OrdersController(IOrderRepository orderRepository)
+        private readonly IOrderServiceAsync orderServiceAsync;
+
+        public OrdersController(IOrderServiceAsync orderServiceAsync)
         {
-            _orderRepository = orderRepository;
+            this.orderServiceAsync = orderServiceAsync;
         }
 
         [HttpGet]
         [Route("All")]
         public async Task<IActionResult> Get()
         {
-            var orders = await _orderRepository.GetAllAsync();
+            var orders = await orderServiceAsync.GetAllAsync();
             return Ok(orders);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var order = await _orderRepository.GetByIdAsync(id);
+            var order = await orderServiceAsync.GetByIdAsync(id);
             if (order == null)
             {
                 return Ok("No order found");
@@ -40,7 +41,7 @@ namespace Order.API.Controllers
         [Route("Customer/{customerId}")]
         public async Task<IActionResult> GetByCustomerId(int customerId)
         {
-            var order = await _orderRepository.GetByCustomerIdAsync(customerId);
+            var order = await orderServiceAsync.GetByCustomerIdAsync(customerId);
             if (order == null)
             {
                 return Ok("No order found");
@@ -52,9 +53,9 @@ namespace Order.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Save(Orders order)
+        public async Task<IActionResult> Save(OrderRequestModel order)
         {
-            var result = await _orderRepository.InsertAsync(order);
+            var result = await orderServiceAsync.InsertAsync(order);
             if (result == 1)
             {
                 return Ok("New order is saved");
@@ -66,9 +67,9 @@ namespace Order.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] Orders order)
+        public async Task<IActionResult> Update(int id, [FromBody] OrderRequestModel order)
         {
-            var result = await _orderRepository.UpdateAsync(order);
+            var result = await orderServiceAsync.UpdateAsync(order);
             if (result == 1)
             {
                 return Ok("Order is updated");
@@ -82,7 +83,7 @@ namespace Order.API.Controllers
         [HttpDelete]
         public async Task<IActionResult> Delete(int id)
         {
-            var result = await _orderRepository.DeleteAsync(id);
+            var result = await orderServiceAsync.DeleteAsync(id);
             if (result == 1)
             {
                 return Ok("Delete successfully");
